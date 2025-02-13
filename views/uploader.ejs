@@ -13,10 +13,11 @@
 <div class="text-center mt-4">
   
 
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file">
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileInput" required>
         <button type="submit">Upload</button>
     </form>
+    
       
 </div>
 
@@ -26,18 +27,33 @@
 
 <!-- Success Popup -->
 <script>
-document.querySelector("form").addEventListener("submit", async (e) => {
+document.querySelector("#uploadForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const response = await fetch("/upload", {
+
+    let formData = new FormData();
+    let fileInput = document.querySelector("#fileInput");
+
+    if (!fileInput.files.length) {
+        alert("Please select a file.");
+        return;
+    }
+
+    formData.append("file", fileInput.files[0]);
+
+    fetch("/upload", {
         method: "POST",
         body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(error => {
+        console.error("Upload failed:", error);
+        alert("File upload failed.");
     });
-
-    const result = await response.json();
-    alert(result.message);
 });
+
 
 </script>
 

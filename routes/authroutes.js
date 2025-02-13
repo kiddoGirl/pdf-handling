@@ -12,32 +12,31 @@ function isAuthenticated(req, res, next) {
 // Login Page
 router.get("/login", (req, res) => res.render("login", { error: null }));
 
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-
+router.post("/login", async (req, res) => {
     try {
+        const { email, password } = req.body;
         const user = await User.findOne({ email });
+
         if (!user) {
-            return res.render('login', { error: 'User not found!' });
+            return res.status(400).send("User not found");
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.render('login', { error: 'Incorrect password!' });
+            return res.status(400).send("Invalid credentials");
         }
 
-        req.session.user = { id: user._id, name: user.name, role: user.role };
+        req.session.user = user; // ✅ Store user in session
 
-        // Redirect based on role
-        if (user.role === 'uploader') {
-            res.redirect('/uploader');
+        // ✅ Redirect based on role
+        if (user.role === "viewer") {
+            return res.redirect("/viewer");
         } else {
-            res.redirect('/viewer');
+            return res.redirect("/dashboard");
         }
-
     } catch (err) {
         console.error(err);
-        res.render('error', { message: 'Login failed. Try again.' });
+        res.status(500).send("Error logging in");
     }
 });
 
@@ -45,32 +44,35 @@ router.post('/login', async (req, res) => {
 // Signup Page
 router.get("/signup", (req, res) => res.render("signup", { error: null }));
 
-router.post('/signup', async (req, res) => {
-    const { name, email, password, role } = req.body;
-
+router.post("/signup", async (req, res) => {
     try {
-        let user = await User.findOne({ email });
-        if (user) {
-            return res.render('signup', { error: 'User already exists!' });
-        }
-
+        const { username, email, password, role } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        user = new User({ name, email, password: hashedPassword, role });
-        await user.save();
 
-        
-        req.session.user = { id: user._id, name: user.name, role: user.role };
-        if (user.role === 'uploader') {
-            res.redirect('/uploader');
+        const newUser = new User({
+            username,
+            email,
+            password: hashedPassword,
+            role, // "viewer" or "admin"
+        });
+
+        await newUser.save();
+
+        // ✅ Set session/cookie to track login
+        req.session.user = newUser;
+
+        // ✅ Redirect to viewer page
+        if (role === "viewer") {
+            return res.redirect("/viewer"); // Make sure this route exists!
         } else {
-            res.redirect('/viewer');
+            return res.redirect("/dashboard"); // Redirect admin elsewhere
         }
-
     } catch (err) {
         console.error(err);
-        res.render('error', { message: 'Signup failed. Try again.' });
+        res.status(500).send("Error signing up");
     }
 });
+
 
 
 module.exports = router;
