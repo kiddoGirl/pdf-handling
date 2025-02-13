@@ -32,7 +32,7 @@ router.post("/login", async (req, res) => {
         if (user.role === "viewer") {
             return res.redirect("/viewer");
         } else {
-            return res.redirect("/dashboard");
+            return res.redirect("/uploader");
         }
     } catch (err) {
         console.error(err);
@@ -65,7 +65,7 @@ router.post("/signup", async (req, res) => {
         if (role === "viewer") {
             return res.redirect("/viewer"); // Make sure this route exists!
         } else {
-            return res.redirect("/dashboard"); // Redirect admin elsewhere
+            return res.redirect("/uploader"); // Redirect admin elsewhere
         }
     } catch (err) {
         console.error(err);

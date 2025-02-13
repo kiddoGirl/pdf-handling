@@ -6,11 +6,10 @@ const authRoutes = require("./routes/authroutes");
 const fileRoutes = require("./routes/fileroutes");
 const multer = require('multer');
 const crypto = require("crypto");
-const Grid = require('gridfs-stream');
+const { MongoClient, GridFSBucket } = require("mongodb");
 const { GridFsStorage } = require('multer-gridfs-storage');
 const path = require('path');
 const methodOverride = require('method-override');
-const { GridFSBucket } = require("mongodb");
 
 
 const app = express();
@@ -30,6 +29,7 @@ const mongoURI ="mongodb+srv://manjubashini2110:Manju03@cluster0.adkmyfp.mongodb
 mongoose.connect(mongoURI)
     .then(() => console.log("MongoDB Connected"))
     .catch(err => console.log("MongoDB Connection Error:", err));
+
 
 
 
@@ -55,13 +55,14 @@ const upload = multer({ storage });
 
 console.log(crypto.randomBytes(16).toString("hex"));
 
-let gfs;
 const conn = mongoose.connection;
-conn.once("open", () => {
-    gfs = Grid(conn.db, mongoose.mongo);
-    gfs.collection("uploads"); // ✅ Ensure this matches your collection name
-});
 
+let bucket;
+
+conn.once("open", () => {
+    console.log("MongoDB Connected");
+    bucket = new GridFSBucket(conn.db, { bucketName: "uploads" });
+});
 
 
 app.post("/upload", upload.single("file"), (req, res) => {
@@ -78,12 +79,12 @@ app.get("/viewer", async (req, res) => {
         return res.redirect("/login"); // Redirect if not logged in
     }
 
-    if (!gfs) {
+    if (!bucket) {
         return res.status(500).send("GridFS not initialized yet. Try again later.");
     }
 
     try {
-        const files = await gfs.files.find().toArray(); // ✅ Fetch all files safely
+        const files = await conn.db.collection("uploads.files").find().toArray(); // ✅ CORRECT QUERY
         res.render("viewer", { files });
     } catch (err) {
         console.error("Error fetching files:", err);
@@ -93,29 +94,17 @@ app.get("/viewer", async (req, res) => {
 
 
 
-// ✅ Route to Download PDF
-app.get('/download/:filename', (req, res) => {
-    gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-        if (!file || file.length === 0) {
-            return res.status(404).json({ err: "No file exists" });
-        }
 
-        const readstream = gfs.createReadStream(file.filename);
-        res.set('Content-Type', 'application/pdf');
-        res.set('Content-Disposition', 'attachment; filename=' + file.filename);
-        readstream.pipe(res);
-    });
-});
+
 
 app.get("/download/:filename", async (req, res) => {
-    if (!gfs) {
-        return res.status(500).send("GridFS not initialized. Try again later.");
-    }
-
     try {
-        const bucket = new GridFSBucket(mongoose.connection.db, { bucketName: "uploads" });
+        if (!bucket) {
+            return res.status(500).send("GridFS not initialized. Try again later.");
+        }
 
-        const file = await gfs.files.findOne({ filename: req.params.filename });
+        const file = await conn.db.collection("uploads.files").findOne({ filename: req.params.filename });
+
         if (!file) {
             return res.status(404).send("File not found.");
         }
@@ -132,6 +121,7 @@ app.get("/download/:filename", async (req, res) => {
         res.status(500).send("Error downloading file.");
     }
 });
+
 
 
 app.get('/', (req, res) => {
