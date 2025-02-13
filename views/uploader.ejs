@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+
+    <h2 class="text-center">Welcome</h2>
+
+<div class="text-center mt-4">
+  
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <button type="submit">Upload</button>
+    </form>
+      
+</div>
+
+<div class="text-center mt-3">
+    <a href="/logout" class="btn btn-danger">Logout</a>
+</div>
+
+<!-- Success Popup -->
+<script>
+document.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const response = await fetch("/upload", {
+        method: "POST",
+        body: formData,
+    });
+
+    const result = await response.json();
+    alert(result.message);
+});
+
+</script>
+
+
+
+    
+
+</body>
+</html>

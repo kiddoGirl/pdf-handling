@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h2 class="text-center">Available PDFs</h2>
+
+    <div class="container">
+        <ul class="list-group">
+            <% files.forEach(file => { %>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <%= file.filename %>
+                    <a href="/download/<%= file.filename %>" class="btn btn-success btn-sm">Download</a>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+    
+    <div class="text-center mt-3">
+        <a href="/logout" class="btn btn-danger">Logout</a>
+    </div>
+    
+    
+
+</body>
+</html>
