@@ -50,6 +50,8 @@ mongoose.connect(mongoURI)
             });
         },
     });
+
+    
   
 const upload = multer({ storage });
 
@@ -75,10 +77,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
 
 
 app.get("/viewer", async (req, res) => {
-    if (!req.session.user) {
-        return res.redirect("/login"); // Redirect if not logged in
-    }
-
+   
     if (!bucket) {
         return res.status(500).send("GridFS not initialized yet. Try again later.");
     }
@@ -96,32 +95,24 @@ app.get("/viewer", async (req, res) => {
 
 
 
-
-app.get("/download/:filename", async (req, res) => {
+app.delete("/delete/:id", async (req, res) => {
     try {
         if (!bucket) {
             return res.status(500).send("GridFS not initialized. Try again later.");
         }
 
-        const file = await conn.db.collection("uploads.files").findOne({ filename: req.params.filename });
+        const fileId = new mongoose.Types.ObjectId(req.params.id);
 
-        if (!file) {
-            return res.status(404).send("File not found.");
-        }
+        // Delete file chunks and metadata from GridFS
+        await conn.db.collection("uploads.chunks").deleteMany({ files_id: fileId });
+        await conn.db.collection("uploads.files").deleteOne({ _id: fileId });
 
-        res.set({
-            "Content-Type": file.contentType,
-            "Content-Disposition": `attachment; filename="${file.filename}"`,
-        });
-
-        const downloadStream = bucket.openDownloadStreamByName(file.filename);
-        downloadStream.pipe(res);
+        res.status(200).json({ success: true, message: "File deleted successfully." });
     } catch (err) {
-        console.error("Download error:", err);
-        res.status(500).send("Error downloading file.");
+        console.error("Delete error:", err);
+        res.status(500).json({ success: false, message: "Error deleting file." });
     }
 });
-
 
 
 app.get('/', (req, res) => {

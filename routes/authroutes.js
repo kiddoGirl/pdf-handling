@@ -9,26 +9,36 @@ function isAuthenticated(req, res, next) {
     res.redirect("/login");
 }
 
-// Login Page
+// ✅ Login Page
 router.get("/login", (req, res) => res.render("login", { error: null }));
 
+// ✅ Handle Login
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        console.log("Login request received:", req.body);
 
+        const user = await User.findOne({ email });
         if (!user) {
+            console.log("User not found");
             return res.status(400).send("User not found");
         }
 
+        console.log("Stored Hashed Password:", user.password);
+        console.log("Entered Plain Password:", password);
+
+        // Compare plain password with stored hashed password
         const isMatch = await bcrypt.compare(password, user.password);
+        console.log("Password Match Result:", isMatch);
+
         if (!isMatch) {
+            console.log("Password comparison failed.");
             return res.status(400).send("Invalid credentials");
         }
 
-        req.session.user = user; // ✅ Store user in session
+        req.session.user = user; // Store user in session
 
-        // ✅ Redirect based on role
+        // Redirect based on role
         if (user.role === "viewer") {
             return res.redirect("/viewer");
         } else {
@@ -41,31 +51,44 @@ router.post("/login", async (req, res) => {
 });
 
 
-// Signup Page
+
+// ✅ Signup Page
 router.get("/signup", (req, res) => res.render("signup", { error: null }));
 
+// ✅ Handle Signup
 router.post("/signup", async (req, res) => {
     try {
-        const { username, email, password, role } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const { name, email, password, role } = req.body;
 
+        console.log("Signup request received:", req.body);
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).send("User already exists");
+        }
+
+        // Create new user (WITHOUT hashing manually)
         const newUser = new User({
-            username,
+            name,
             email,
-            password: hashedPassword,
-            role, // "viewer" or "admin"
+            password, // Directly store plain password, let Mongoose middleware hash it
+            role,
         });
 
         await newUser.save();
 
-        // ✅ Set session/cookie to track login
-        req.session.user = newUser;
+        // Fetch stored user to verify password is stored correctly
+        const savedUser = await User.findOne({ email });
+        console.log("Stored Hashed Password (after saving):", savedUser.password);
 
-        // ✅ Redirect to viewer page
+        req.session.user = newUser; // Store user in session
+
+        // Redirect based on role
         if (role === "viewer") {
-            return res.redirect("/viewer"); // Make sure this route exists!
+            return res.redirect("/viewer");
         } else {
-            return res.redirect("/uploader"); // Redirect admin elsewhere
+            return res.redirect("/uploader");
         }
     } catch (err) {
         console.error(err);
@@ -75,5 +98,13 @@ router.post("/signup", async (req, res) => {
 
 
 
-module.exports = router;
 
+
+// ✅ Logout Route
+router.get("/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.redirect("/login");
+    });
+});
+
+module.exports = router;

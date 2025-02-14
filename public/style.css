@@ -1,0 +1,183 @@
+body {
+    background-image: url('/side-view-man-developing-photos-darkroom_23-2149893810.jpg'); 
+    background-size: cover;
+    background-position: center;
+    font-family: Arial, sans-serif;
+    min-height: 100vh; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    margin: 0; 
+    padding: 40px 0; 
+}
+
+.container-box {
+    width: 100%;
+    max-width: 600px; 
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.2); 
+    backdrop-filter: blur(10px); 
+    border-radius: 10px;
+    text-align: center; 
+}
+
+.pdf-container-box{
+    width: 80%;
+    max-width: 800px; 
+    padding: 20px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px); 
+    border-radius: 10px;
+    text-align: center; 
+    margin: 50px auto; 
+}
+
+.pdf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.pdf-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px; 
+    background: white;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.pdf-card:hover {
+    transform: scale(1.05);
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.pdf-name {
+    max-width: 350px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+}
+
+
+h2{
+    color: #ffffff;
+    font-weight: bolder;
+    font-size: 44px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+
+input[type="email"],
+input[type="name"],
+input[type="password"],
+input[type="text"],
+input[type="file"],
+select {
+    width: 80% !important; 
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border 0.3s ease-in-out;
+    display: block;
+    margin: 10px auto; 
+}
+
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.button-group a , button{
+    flex: 1; 
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    text-transform: uppercase;
+    transition: background 0.3s ease-in-out;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-login {
+    background-color: #FFD700; 
+    color: black !important;
+    border: none;
+    transition: background 0.3s ease-in-out;
+}
+
+.btn-login:hover {
+    background-color:#E6C200;
+}
+
+.btn-signup {
+    background-color: #660000;
+    color: #ffffff;
+    border: none;
+    transition: background 0.3s ease-in-out;
+}
+
+.btn-signup:hover {
+    background-color: #990000;
+    color: #ffffff;
+}
+
+
+.btn {
+    padding: 8px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    text-transform: uppercase;
+    transition: background 0.3s ease-in-out;
+    margin-top: 20px;
+}
+
+.btn-download {
+    background-color: #00A36C;
+    color: white;
+    border: none;
+}
+
+.btn-download:hover {
+    background-color: #008B5E;
+    color: #ffffff;
+}
+
+.btn-upload {
+    background-color: #660000;
+    color: white;
+    border: none;
+}
+
+.btn-upload:hover {
+    background-color: #990000;
+    color: #ffffff;
+}
+
+.btn-logout {
+    background-color: #FFD700; 
+    color: black !important;
+    border: none;
+    transition: background 0.3s ease-in-out;
+}
+
+.btn-logout:hover {
+    background-color: #E6C200;
+}
+
+
+.no-pdf {
+    text-align: center;
+    font-style: italic;
+    color: gray;
+}
