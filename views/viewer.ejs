@@ -37,7 +37,8 @@
                         <span class="pdf-name"><%= file.originalFilename || file.filename %></span>
                         <div>
                             <a href="/download/<%= file._id %>" class="btn btn-download btn-sm">Download</a>
-                            <button class="btn btn-danger btn-sm" onclick="deleteFile('<%= file._id %>')">Delete</button>
+                            <button class="btn btn-primary btn-sm" onclick="printFile('<%= file._id %>')">Print</button>
+                            <button class="btn btn-upload btn-sm" onclick="deleteFile('<%= file._id %>')">Delete</button>
                         </div>
                     </div>
                 <% }); %>
@@ -49,5 +50,38 @@
         <!-- <a href="/logout" class="btn btn-logout  mt-3">Logout</a> -->
     </div>
 
+    <script>
+        async function printFile(fileId) {
+            try {
+                const response = await fetch(`/view/${fileId}`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch the file.");
+                }
+    
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+    
+                const iframe = document.createElement("iframe");
+                iframe.style.display = "none";
+                iframe.src = blobUrl;
+                document.body.appendChild(iframe);
+    
+                iframe.onload = function () {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+    
+                    // Wait for print to finish before removing the iframe
+                    iframe.contentWindow.onafterprint = () => {
+                        document.body.removeChild(iframe);
+                        URL.revokeObjectURL(blobUrl);
+                    };
+                };
+            } catch (error) {
+                console.error("Print error:", error);
+                alert("Error printing file.");
+            }
+        }
+    </script>
+    
 </body>
 </html>

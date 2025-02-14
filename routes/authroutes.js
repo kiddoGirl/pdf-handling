@@ -21,7 +21,7 @@ router.post("/login", async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) {
             console.log("User not found");
-            return res.status(400).send("User not found");
+            return res.render("login", { error: "User not found" });
         }
 
         console.log("Stored Hashed Password:", user.password);
@@ -33,7 +33,7 @@ router.post("/login", async (req, res) => {
 
         if (!isMatch) {
             console.log("Password comparison failed.");
-            return res.status(400).send("Invalid credentials");
+            return res.render("login", { error: "Invalid credentials" });
         }
 
         req.session.user = user; // Store user in session
@@ -46,7 +46,7 @@ router.post("/login", async (req, res) => {
         }
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error logging in");
+        res.render("login", { error: "Error logging in" });
     }
 });
 
@@ -65,7 +65,7 @@ router.post("/signup", async (req, res) => {
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).send("User already exists");
+            return res.render("signup", { error: "User already exists" });
         }
 
         // Create new user (WITHOUT hashing manually)
@@ -92,9 +92,12 @@ router.post("/signup", async (req, res) => {
         }
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error signing up");
+        res.render("signup", { error: "Error signing up" });
     }
 });
+
+
+
 
 
 

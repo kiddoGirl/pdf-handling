@@ -137,6 +137,35 @@ app.get("/download/:id", async (req, res) => {
     }
 });
 
+app.get("/view/:id", async (req, res) => {
+    try {
+        if (!bucket) {
+            return res.status(500).send("GridFS not initialized. Try again later.");
+        }
+
+        const fileId = new mongoose.Types.ObjectId(req.params.id);
+
+        const file = await conn.db.collection("uploads.files").findOne({ _id: fileId });
+
+        if (!file) {
+            return res.status(404).send("File not found.");
+        }
+
+        res.set({
+            "Content-Type": "application/pdf", // Ensure it opens in the browser
+            "Content-Disposition": "inline", // Opens PDF instead of downloading
+        });
+
+        const viewStream = bucket.openDownloadStream(fileId);
+        viewStream.pipe(res);
+    } catch (err) {
+        console.error("View error:", err);
+        res.status(500).send("Error viewing file.");
+    }
+});
+
+
+
 
 
 app.get('/', (req, res) => {

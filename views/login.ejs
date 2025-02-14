@@ -10,6 +10,11 @@
 <body>
     <div class="container-box">
         <h2>Login</h2>
+
+        <% if (error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        
         <form method="POST" action="/login">
             <input type="email" name="email" class="form-control mb-3" required placeholder="Email">
             <input type="password" name="password" class="form-control mb-3" required placeholder="Password">
