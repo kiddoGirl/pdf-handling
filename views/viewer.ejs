@@ -14,7 +14,7 @@
                     .then(data => {
                         if (data.success) {
                             alert("File deleted successfully!");
-                            location.reload(); // Refresh to update the list
+                            location.reload(); 
                         } else {
                             alert("Error deleting file.");
                         }
@@ -70,7 +70,7 @@
                     iframe.contentWindow.focus();
                     iframe.contentWindow.print();
     
-                    // Wait for print to finish before removing the iframe
+                    
                     iframe.contentWindow.onafterprint = () => {
                         document.body.removeChild(iframe);
                         URL.revokeObjectURL(blobUrl);

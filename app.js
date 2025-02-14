@@ -22,7 +22,7 @@ app.set("view engine", "ejs");
 
 
 
-// MongoDB Connection
+
 const mongoURI ="mongodb+srv://manjubashini2110:Manju03@cluster0.adkmyfp.mongodb.net/pdf-App"
 
 mongoose.connect(mongoURI)
@@ -37,7 +37,7 @@ mongoose.connect(mongoURI)
         options: { useNewUrlParser: true, useUnifiedTopology: true },
         file: async (req, file) => {
             return new Promise((resolve, reject) => {
-                crypto.randomBytes(16, (err, buf) => { // ✅ Ensure this line is correct
+                crypto.randomBytes(16, (err, buf) => { 
                     if (err) return reject(err);
                     const filename = buf.toString("hex") + path.extname(file.originalname);
                     const fileInfo = {
@@ -82,7 +82,7 @@ app.get("/viewer", async (req, res) => {
     }
 
     try {
-        const files = await conn.db.collection("uploads.files").find().toArray(); // ✅ CORRECT QUERY
+        const files = await conn.db.collection("uploads.files").find().toArray(); 
         res.render("viewer", { files });
     } catch (err) {
         console.error("Error fetching files:", err);
@@ -99,7 +99,7 @@ app.delete("/delete/:id", async (req, res) => {
 
         const fileId = new mongoose.Types.ObjectId(req.params.id);
 
-        // Delete file chunks and metadata from GridFS
+    
         await conn.db.collection("uploads.chunks").deleteMany({ files_id: fileId });
         await conn.db.collection("uploads.files").deleteOne({ _id: fileId });
 
@@ -152,8 +152,8 @@ app.get("/view/:id", async (req, res) => {
         }
 
         res.set({
-            "Content-Type": "application/pdf", // Ensure it opens in the browser
-            "Content-Disposition": "inline", // Opens PDF instead of downloading
+            "Content-Type": "application/pdf", 
+            "Content-Disposition": "inline", 
         });
 
         const viewStream = bucket.openDownloadStream(fileId);
@@ -173,7 +173,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/uploader', (req, res) => {
-    res.render('uploader'); // Make sure 'uploader.ejs' exists inside the 'views' folder
+    res.render('uploader'); 
 });
 
 
